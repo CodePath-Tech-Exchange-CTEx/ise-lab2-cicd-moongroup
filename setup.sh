@@ -1,9 +1,9 @@
 ### VARIABLES TO CHANGE - START
-PROJECT_ID=
-PROJECT_NUMBER=
-SERVICE_NAME=
-GITHUB_ORG=
-GITHUB_REPO=
+PROJECT_ID=oluwadunsin-adesanya-fisk
+PROJECT_NUMBER=64058716019
+SERVICE_NAME=moon-website
+GITHUB_ORG=CodePath-Tech-Exchange-CTEx
+GITHUB_REPO=ise-lab2-cicd-moongroup
 ### VARIABLES TO CHANGE - END
 
 # ----------- Set Up GCP Project ----------- #
