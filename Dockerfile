@@ -2,7 +2,7 @@
 FROM python:3.10
 
 # Expose 8080 as the port
-EXPOSE 8080
+EXPOSE 8501
 
 # Set the working directory to /app
 WORKDIR /app
