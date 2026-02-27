@@ -47,3 +47,52 @@ def display_recent_workouts(workouts_list):
 def display_genai_advice(timestamp, content, image):
     """Write a good docstring here."""
     pass
+
+
+# ---------------------------
+# Product Data
+# ---------------------------
+
+from typing import List, Dict, Optional, Any
+
+
+def load_products() -> List[Dict[str, Any]]:
+    """
+    Returns the list of products for the store.
+
+    For MVP speed, this is hard-coded.
+    Later, you can replace this with a JSON/CSV load without changing other code.
+    """
+    return [
+        {
+            "id": "h001",
+            "name": "Howard Classic Cap",
+            "description": "Maroon dad hat with embroidered HU logo.",
+            "price": 24.99,
+            "image": "assets/h001.jpg",  # or an image URL
+        },
+        {
+            "id": "h002",
+            "name": "Streetwear Snapback",
+            "description": "Flat brim snapback with adjustable strap.",
+            "price": 29.99,
+            "image": "assets/h002.jpg",
+        },
+        {
+            "id": "h003",
+            "name": "flower blossom",
+            "description": "straight from japan.",
+            "price": 19.99,
+            "image": "assets/h003.jpg",
+        },
+    ]
+
+
+def get_product_by_id(products: List[Dict[str, Any]], product_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Returns a single product dict by its id, or None if not found.
+    """
+    for product in products:
+        if product.get("id") == product_id:
+            return product
+    return None
