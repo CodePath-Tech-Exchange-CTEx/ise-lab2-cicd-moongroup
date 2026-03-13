@@ -61,7 +61,7 @@ def test_display_genai_advice_returns_none(monkeypatch):
         def warning(self, *a, **k): pass
         def divider(self, *a, **k): pass
 
-    monkeypatch.setattr(modules, "st", DummySt())
+    monkeypatch.setattr(modules, "st", DummySt()) # noqa: F821
 
     result = display_genai_advice(
         "2026-03-13", 
