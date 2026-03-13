@@ -1,5 +1,10 @@
 import unittest
 import math
+import sys
+import os
+# This tells the GitHub runner: "Look in the current folder for files!"
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 import modules
 from modules import (
     load_products,
