@@ -7,10 +7,10 @@
 #############################################################################
 
 import unittest
-from streamlit.testing.v1 import AppTest
 import copy
 import math
-import modules
+import modules  # <--- Essential for monkeypatching 'st'
+import streamlit as st
 from modules import (
     load_products,
     get_product_by_id,
@@ -22,6 +22,8 @@ from modules import (
     checkout_message,
     display_genai_advice
 )
+
+REQUIRED_KEYS = {"id", "name", "description", "price", "image"}
 
 # Write your tests below
 '''
@@ -196,7 +198,6 @@ def test_checkout_message():
 
 
 def test_display_genai_advice_returns_none(monkeypatch):
-    # Mock streamlit calls so test can run without launching Streamlit
     class DummySt:
         def title(self, *a, **k): pass
         def caption(self, *a, **k): pass
@@ -206,11 +207,12 @@ def test_display_genai_advice_returns_none(monkeypatch):
         def warning(self, *a, **k): pass
         def divider(self, *a, **k): pass
 
+    # This line is where the 'modules' name is used as a variable
     monkeypatch.setattr(modules, "st", DummySt())
 
-    result = modules.display_genai_advice(
-        "2026-02-28 11:05 AM",
-        "Test advice content",
-        "assets/motivation.jpg"
+    result = display_genai_advice( # Calling the function directly since we imported it
+        "2026-03-13", 
+        "Test advice", 
+        None
     )
-    assert result is None    
+    assert result is None
