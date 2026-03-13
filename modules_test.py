@@ -10,6 +10,7 @@ import unittest
 from streamlit.testing.v1 import AppTest
 import copy
 import math
+import modules
 from modules import (
     load_products,
     get_product_by_id,
