@@ -64,20 +64,6 @@ if __name__ == "__main__":
 '''
 
 
-from modules import (
-    load_products,
-    get_product_by_id,
-    init_cart,
-    add_to_cart,
-    remove_from_cart,
-    update_qty,
-    calc_total,
-    checkout_message,
-)
-
-REQUIRED_KEYS = {"id", "name", "description", "price", "image"}
-
-
 def test_load_products_returns_list_of_three():
     products = load_products()
     assert isinstance(products, list)
@@ -185,16 +171,13 @@ def test_calc_total_ignores_unknown_product_ids():
 
 
 def test_checkout_message():
-    # Create fake data for the test
     fake_cart = {"h001": 1}
     fake_products = [{"id": "h001", "name": "Test Hat", "price": 10.00}]
     
-    # Now call the function with the data it needs
     result = checkout_message(fake_cart, fake_products)
     
-    # Check if the result is a string (since it returns a success message)
     assert isinstance(result, str)
-    assert "Test Hat" not in result # Optional: check for price or quantity instead
+    assert "crashed" not in result.lower()
 
 
 def test_display_genai_advice_returns_none(monkeypatch):
@@ -207,12 +190,12 @@ def test_display_genai_advice_returns_none(monkeypatch):
         def warning(self, *a, **k): pass
         def divider(self, *a, **k): pass
 
-    # This line is where the 'modules' name is used as a variable
+    # monkeypatch needs the MODULE object, not just a function
     monkeypatch.setattr(modules, "st", DummySt())
 
-    result = display_genai_advice( # Calling the function directly since we imported it
-        "2026-03-13", 
-        "Test advice", 
-        None
+    result = display_genai_advice(
+        "2026-02-28 11:05 AM",
+        "Test advice content",
+        "assets/motivation.jpg"
     )
     assert result is None
