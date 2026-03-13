@@ -19,6 +19,7 @@ from modules import (
     update_qty,
     calc_total,
     checkout_message,
+    display_genai_advice
 )
 
 # Write your tests below
