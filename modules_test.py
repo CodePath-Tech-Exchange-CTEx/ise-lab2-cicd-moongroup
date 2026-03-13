@@ -45,13 +45,18 @@ def test_calc_total_basic():
     assert math.isclose(total, p1, rel_tol=1e-9)
 
 def test_checkout_message():
-    fake_cart = {"h001": 1}
-    fake_products = [{"id": "h001", "name": "Test Hat", "price": 10.00}]
+    # We create the 'fake' data the function needs to run
+    fake_cart = {"h001": 2}
+    fake_products = [{"id": "h001", "name": "Howard Cap", "price": 25.00}]
+    
+    # We MUST pass both variables into the parentheses here
     result = checkout_message(fake_cart, fake_products)
+    
     assert isinstance(result, str)
-    assert "1" in result
+    assert "50.00" in result  # 2 hats at $25.00 = $50.00
 
 def test_display_genai_advice_returns_none(monkeypatch):
+    import modules # Import locally to force the linter to see it
     class DummySt:
         def title(self, *a, **k): pass
         def caption(self, *a, **k): pass
@@ -61,11 +66,8 @@ def test_display_genai_advice_returns_none(monkeypatch):
         def warning(self, *a, **k): pass
         def divider(self, *a, **k): pass
 
-    monkeypatch.setattr(modules, "st", DummySt()) # noqa: F821
+    # This fixes the 'NameError: modules is not defined'
+    monkeypatch.setattr(modules, "st", DummySt())
 
-    result = display_genai_advice(
-        "2026-03-13", 
-        "Great hat choice!", 
-        None
-    )
+    result = display_genai_advice("2026-03-13", "Looks good!", None)
     assert result is None
