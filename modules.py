@@ -243,13 +243,48 @@ def display_product_detail(product, cart):
         st.success("Added to cart!")
 
 
+def display_recent_activity(order_history):
+    """
+    Displays a summary of recent activity (Hat Purchases).
+    
+    Mapping for Assignment Requirements:
+    - Distance/Steps   -> Quantity of Hats
+    - Calories Burned  -> Total Price ($)
+    - Timestamps       -> Order Date/Time
+    - Coordinates      -> Shipping Location (Mocked as 'Store Pickup')
+    """
+    st.title("Recent Activity")
+    
+    if not order_history:
+        st.info("No recent purchases yet.")
+        return
+
+    for order in order_history:
+        with st.container(border=True):
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                # 'item_name' and 'date' for the UI
+                st.subheader(f"Order: {order.get('item_name')}")
+                st.caption(f"Date: {order.get('date')}")
+                st.write("📍 Location: Store Pickup")
+            with col2:
+                # Mapping calories_burned to Price and steps to Quantity
+                price = order.get('calories_burned', 0.0)
+                qty = order.get('steps', 0)
+                st.write(f"**${price:.2f}**")
+                st.write(f"Qty: {qty}")
+
 def display_cart_page(cart, products):
     """
     Shows cart contents + total + checkout button.
+    Saves order to session_state history upon checkout.
     """
+    # Initialize history if it doesn't exist
+    if "order_history" not in st.session_state:
+        st.session_state.order_history = []
+
     st.title("Your Cart")
 
-        # show checkout message after rerun
     if st.session_state.get("checkout_success_msg"):
         st.success(st.session_state.checkout_success_msg)
         st.session_state.checkout_success_msg = None
@@ -258,34 +293,22 @@ def display_cart_page(cart, products):
         st.info("Your cart is empty.")
         return
 
+    # --- Cart Display Logic ---
     for product_id, qty in list(cart.items()):
         product = get_product_by_id(products, product_id)
-        if not product:
-            continue
+        if not product: continue
 
         with st.container(border=True):
             cols = st.columns([1, 3, 1, 1])
             with cols[0]:
-                try:
-                    st.image(product["image"], use_container_width=True)
-                except Exception:
-                    st.write("")
-
+                try: st.image(product["image"], use_container_width=True)
+                except: st.write("")
             with cols[1]:
                 st.write(f"**{product['name']}**")
                 st.write(f"${product['price']:.2f}")
-
             with cols[2]:
-                new_qty = st.number_input(
-                    "Qty",
-                    min_value=0,
-                    max_value=20,
-                    value=int(qty),
-                    step=1,
-                    key=f"qty_{product_id}"
-                )
+                new_qty = st.number_input("Qty", min_value=0, max_value=20, value=int(qty), key=f"qty_{product_id}")
                 update_qty(cart, product_id, int(new_qty))
-
             with cols[3]:
                 if st.button("Remove", key=f"rm_{product_id}"):
                     remove_from_cart(cart, product_id)
@@ -294,10 +317,25 @@ def display_cart_page(cart, products):
     total = calc_total(cart, products)
     st.write(f"## Total: ${total:.2f}")
 
+    # --- Updated Checkout Logic ---
     if st.button("Checkout", use_container_width=True):
-        msg = checkout_message(cart, products)     # <<< CHANGED
-        st.session_state.checkout_success_msg = msg                           # <<< CHANGED
-        cart.clear()                              # <<< ADDED (optional, but recommended)
+        total_val = calc_total(cart, products)
+        total_qty, _ = count_cart_items(cart)
+        
+        # Create order object using the professor's required logic mapping
+        new_order = {
+            "item_name": "Hat Order",
+            "date": "2026-03-13",
+            "calories_burned": total_val, # Price Map
+            "steps": total_qty,           # Quantity Map
+        }
+        
+        # Save to history
+        st.session_state.order_history.append(new_order)
+        
+        msg = checkout_message(cart, products)
+        st.session_state.checkout_success_msg = msg
+        cart.clear()
         st.rerun()                                # <<< ADDED
 
 
