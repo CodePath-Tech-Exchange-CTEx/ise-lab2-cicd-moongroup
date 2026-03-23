@@ -8,140 +8,124 @@
 # testing earlier units.
 #############################################################################
 
-import random
+from google.cloud import bigquery
+import vertexai
+from vertexai.generative_models import GenerativeModel
+import os
 
-users = {
-    'user1': {
-        'full_name': 'Remi',
-        'username': 'remi_the_rems',
-        'date_of_birth': '1990-01-01',
-        'profile_image': 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Puma_shoes.jpg',
-        'friends': ['user2', 'user3', 'user4'],
-    },
-    'user2': {
-        'full_name': 'Blake',
-        'username': 'blake',
-        'date_of_birth': '1990-01-01',
-        'profile_image': 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Puma_shoes.jpg',
-        'friends': ['user1'],
-    },
-    'user3': {
-        'full_name': 'Jordan',
-        'username': 'jordanjordanjordan',
-        'date_of_birth': '1990-01-01',
-        'profile_image': 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Puma_shoes.jpg',
-        'friends': ['user1', 'user4'],
-    },
-    'user4': {
-        'full_name': 'Gemmy',
-        'username': 'gems',
-        'date_of_birth': '1990-01-01',
-        'profile_image': 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Puma_shoes.jpg',
-        'friends': ['user1', 'user3'],
-    },
-}
-
-
-def get_user_sensor_data(user_id, workout_id):
-    """Returns a list of timestampped information for a given workout.
-
-    This function currently returns random data. You will re-write it in Unit 3.
+PROJECT_ID=os.getenv("oluwadunsin-adesanya-fisk")
+DATASET="hat_plug"
+LOCATION="us-central1"
+ 
+bq_client=bigquery.Client(project=PROJECT_ID)
+vertexai.init(project=PROJECT_ID, location=LOCATION)
+genai_model=GenerativeModel("gemini-1.5-flash")
+ 
+# ==============================
+# HELPER FUNCTION
+# ==============================
+def run_query(query, params=None):
+    """Executes a query and returns clean results."""
+    job_config=bigquery.QueryJobConfig(query_parameters=params or [])
+    query_job=bq_client.query(query, job_config=job_config)
+    results=query_job.result()
+    rows=[]
+    for row in results:
+        rows.append(dict(row))
+    return rows
+ 
+# ==============================
+# HATS:)
+# ==============================
+def get_products():
+    query=f"""
+        SELECT *
+        FROM `{PROJECT_ID}.{DATASET}.products`
+        LIMIT 100
     """
-    sensor_data = []
-    sensor_types = [
-        'accelerometer',
-        'gyroscope',
-        'pressure',
-        'temperature',
-        'heart_rate',
+    return run_query(query)
+ 
+def get_product(product_id):
+    query=f"""
+        SELECT *
+        FROM `{PROJECT_ID}.{DATASET}.products`
+        WHERE product_id = @product_id
+        LIMIT 1
+    """
+    params=[
+        bigquery.ScalarQueryParameter("product_id", "STRING", product_id)
     ]
-    for index in range(random.randint(5, 100)):
-        random_minute = str(random.randint(0, 59))
-        if len(random_minute) == 1:
-            random_minute = '0' + random_minute
-        timestamp = '2024-01-01 00:' + random_minute + ':00'
-        data = random.random() * 100
-        sensor_type = random.choice(sensor_types)
-        sensor_data.append(
-            {'sensor_type': sensor_type, 'timestamp': timestamp, 'data': data}
-        )
-    return sensor_data
-
-
-def get_user_workouts(user_id):
-    """Returns a list of user's workouts.
-
-    This function currently returns random data. You will re-write it in Unit 3.
+    results=run_query(query, params)
+    return results[0] if results else None
+ 
+# ==============================
+# WEB-USERS
+# ==============================
+def get_user(user_id):
+    query=f"""
+        SELECT *
+        FROM `{PROJECT_ID}.{DATASET}.users`
+        WHERE user_id = @user_id
+        LIMIT 1
     """
-    workouts = []
-    for index in range(random.randint(1, 3)):
-        random_lat_lng_1 = (
-            1 + random.randint(0, 100) / 100,
-            4 + random.randint(0, 100) / 100,
-        )
-        random_lat_lng_2 = (
-            1 + random.randint(0, 100) / 100,
-            4 + random.randint(0, 100) / 100,
-        )
-        workouts.append({
-            'workout_id': f'workout{index}',
-            'start_timestamp': '2024-01-01 00:00:00',
-            'end_timestamp': '2024-01-01 00:30:00',
-            'start_lat_lng': random_lat_lng_1,
-            'end_lat_lng': random_lat_lng_2,
-            'distance': random.randint(0, 200) / 10.0,
-            'steps': random.randint(0, 20000),
-            'calories_burned': random.randint(0, 100),
-        })
-    return workouts
-
-
-def get_user_profile(user_id):
-    """Returns information about the given user.
-
-    This function currently returns random data. You will re-write it in Unit 3.
+    params=[
+        bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
+    ]
+    results=run_query(query, params)
+    return results[0] if results else None
+ 
+# ==============================
+# CART!
+# ==============================
+def get_cart(user_id):
+    query=f"""
+        SELECT *
+        FROM `{PROJECT_ID}.{DATASET}.cart`
+        WHERE user_id = @user_id
     """
-    if user_id not in users:
-        raise ValueError(f'User {user_id} not found.')
-    return users[user_id]
-
-
-def get_user_posts(user_id):
-    """Returns a list of a user's posts.
-
-    This function currently returns random data. You will re-write it in Unit 3.
+    params=[
+        bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
+    ]
+    return run_query(query, params)
+ 
+# ==============================
+# ORDERS!
+# ==============================
+def get_orders(user_id):
+    query=f"""
+        SELECT *
+        FROM `{PROJECT_ID}.{DATASET}.orders`
+        WHERE user_id = @user_id
+        ORDER BY order_date DESC
     """
-    content = random.choice([
-        'Had a great workout today!',
-        'The AI really motivated me to push myself further, I ran 10 miles!',
-    ])
-    return [{
-        'user_id': user_id,
-        'post_id': 'post1',
-        'timestamp': '2024-01-01 00:00:00',
-        'content': content,
-        'image': 'image_url',
-    }]
-
-
-def get_genai_advice(user_id):
-    """Returns the most recent advice from the genai model.
-
-    This function currently returns random data. You will re-write it in Unit 3.
+    params=[
+        bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
+    ]
+    return run_query(query, params)
+ 
+# ==============================
+# AI RECOMMENDATIONS(OPTIONAL)
+# ==============================
+def get_genai_recommendations(user_id):
     """
-    advice = random.choice([
-        'Your heart rate indicates you can push yourself further. You got this!',
-        "You're doing great! Keep up the good work.",
-        'You worked hard yesterday, take it easy today.',
-        'You have burned 100 calories so far today!',
-    ])
-    image = random.choice([
-        'https://plus.unsplash.com/premium_photo-1669048780129-051d670fa2d1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        None,
-    ])
+    Returns AI-generated hat recommendations
+    """
+    cart=get_cart(user_id)
+    orders=get_orders(user_id)
+    prompt=f"""
+    You are a fashion stylist specializing in hats.
+    Based on:
+    Cart: {cart}
+    Previous Orders: {orders}
+    Recommend 3 hats the user would like.
+    Return JSON with:
+    - product_name
+    - style (e.g., streetwear, luxury, sporty)
+    - reason
+    """
+    response=genai_model.generate_content(prompt)
     return {
-        'advice_id': 'advice1',
-        'timestamp': '2024-01-01 00:00:00',
-        'content': advice,
-        'image': image,
+        "user_id": user_id,
+        "recommendations": response.text
     }
+ 
