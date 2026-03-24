@@ -11,7 +11,7 @@ from internals import create_component
 import streamlit as st
 from typing import List, Dict, Optional, Any
 from pathlib import Path  
-
+import data_fetcher
 
 
 # ---------------------------
@@ -57,34 +57,18 @@ def display_genai_advice(timestamp, content, image):
 
 def load_products() -> List[Dict[str, Any]]:
     """
-    Returns the list of products for the store.
-
-    For MVP speed, this is hard-coded.
-    Later, you can replace this with a JSON/CSV load without changing other code.
+    Returns the list of products for the store from BigQuery.
+    Maps 'product_id' to 'id' to maintain compatibility with the UI.
     """
-    return [
-        {
-            "id": "h001",
-            "name": "Howard Classic Cap",
-            "description": "Maroon dad hat with embroidered HU logo.",
-            "price": 24.99,
-            "image": "assets/h001.jpg",  # or an image URL
-        },
-        {
-            "id": "h002",
-            "name": "Streetwear Snapback",
-            "description": "Flat brim snapback with adjustable strap.",
-            "price": 29.99,
-            "image": "assets/h002.jpg",
-        },
-        {
-            "id": "h003",
-            "name": "flower blossom",
-            "description": "straight from japan.",
-            "price": 19.99,
-            "image": "assets/h003.jpg",
-        },
-    ]
+    # 1. Get the data from your database
+    db_products = data_fetcher.get_products()
+    
+    # 2. Rename the database key 'product_id' to 'id' so the UI still works
+    for product in db_products:
+        if "product_id" in product:
+            product["id"] = product.pop("product_id")
+            
+    return db_products
 
 # ---------------------------
 # Product Data
