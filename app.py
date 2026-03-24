@@ -28,15 +28,29 @@ if __name__ == '__main__':
 '''    
 
 import streamlit as st
+import data_fetcher  # Import to connect to BigQuery/Vertex AI
 from modules import (
-    load_products, get_product_by_id,
-    init_cart, display_product_grid,
-    display_product_detail, display_cart_page,
-    display_genai_advice,                 # <<< ADDED
+    load_products, 
+    get_product_by_id,
+    init_cart, 
+    display_product_grid,
+    display_product_detail, 
+    display_cart_page,
+    display_genai_advice,
 )
-st.set_page_config(page_title="Store", layout="wide")
 
-# Session state init
+# 1. Page Configuration
+st.set_page_config(page_title="HU Store", layout="wide", page_icon="🧢")
+
+# 2. Efficient Data Loading
+# This prevents the app from re-querying the database on every single click.
+@st.cache_data
+def get_all_products():
+    return load_products()
+
+products = get_all_products()
+
+# 3. Session State Initialization
 if "page" not in st.session_state:
     st.session_state.page = "home"
 if "selected_product_id" not in st.session_state:
@@ -44,36 +58,42 @@ if "selected_product_id" not in st.session_state:
 if "cart" not in st.session_state:
     st.session_state.cart = init_cart()
 
-if "advice_timestamp" not in st.session_state:
-    st.session_state.advice_timestamp = "2026-02-28 11:05 AM"
-if "advice_content" not in st.session_state:
-    st.session_state.advice_content = (
-        "Pick one statement hat and keep the rest of your fit clean.\n"
-        "If you go snapback, match it with a neutral hoodie or tee.\n"
-        "Confidence is the best accessory."
-    )
-if "advice_image" not in st.session_state:
-    st.session_state.advice_image = "assets/motivation.JPG"  # change if needed
+# Fetch AI advice once per session
+if "advice_data" not in st.session_state:
+    try:
+        # Tries to get real AI recommendations for the user
+        st.session_state.advice_data = data_fetcher.get_genai_recommendations("user1")
+    except Exception:
+        # Fallback if the AI service is unavailable or not configured
+        st.session_state.advice_data = {
+            "recommendations": "Stick to the classics. A well-fitted HU cap goes with everything!",
+            "user_id": "user1"
+        }
 
-
-products = load_products()
-
-# Top bar
-top = st.columns([5, 1, 1])  # <<< CHANGED (added a column)
+# 4. Top Navigation Bar
+top = st.columns([4, 1, 1]) 
 with top[0]:
-    st.title("HomePage")
+    st.title("HU Campus Store")
 
 with top[1]:
-    if st.button("💡 Style Coach", use_container_width=True):  # <<< ADDED
+    if st.button("💡 Style Coach", use_container_width=True):
         st.session_state.page = "advice"
         st.rerun()
 
 with top[2]:
-    if st.button("🛒 Cart", use_container_width=True):
+    # Dynamic cart count on the button
+    cart_count = sum(st.session_state.cart.values())
+    if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
         st.session_state.page = "cart"
         st.rerun()
-# Routing
+
+st.divider()
+
+# 5. Routing Logic
+# This acts as the "Traffic Controller" for your app's different views.
+
 if st.session_state.page == "home":
+    # display_product_grid returns the ID of whatever was clicked
     clicked_id = display_product_grid(products)
     if clicked_id:
         st.session_state.selected_product_id = clicked_id
@@ -81,45 +101,9 @@ if st.session_state.page == "home":
         st.rerun()
 
 elif st.session_state.page == "detail":
-    product = get_product_by_id(products, st.session_state.selected_product_id)
-    if not product:
-        st.error("Product not found.")
-        if st.button("Back to Home"):
-            st.session_state.page = "home"
-            st.rerun()
-    else:
-        # back button lives inside detail UI; handle it here:
-        # (Streamlit buttons return True only on click, so we check the key)
-        if st.session_state.get("back_home"):
-            st.session_state.page = "home"
-            st.session_state.back_home = False
-            st.rerun()
-
-        display_product_detail(product, st.session_state.cart)
-
-         # <<< ADDED: optional quick link to advice from detail
-        if st.button("Get Style Advice", use_container_width=True):
-            st.session_state.page = "advice"
-            st.rerun()
-
-        if st.button("Go to Cart", use_container_width=True):
-            st.session_state.page = "cart"
-            st.rerun()
-
-elif st.session_state.page == "cart":
-    if st.button("⬅️ Back to Home"):
+    # Navigation back button
+    if st.button("⬅️ Back to Shop"):
         st.session_state.page = "home"
         st.rerun()
 
-    display_cart_page(st.session_state.cart, products)
-
-elif st.session_state.page == "advice":  # <<< ADDED
-    if st.button("⬅️ Back to Home"):
-        st.session_state.page = "home"
-        st.rerun()
-
-    display_genai_advice(
-        st.session_state.advice_timestamp,
-        st.session_state.advice_content,
-        st.session_state.advice_image
-    )    
+    product = get_product_by_id(products, st.session_state   
