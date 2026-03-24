@@ -55,20 +55,19 @@ def display_genai_advice(timestamp, content, image):
 '''
 
 
-def load_products() -> List[Dict[str, Any]]:
+def load_products(fetcher=data_fetcher.get_products):
     """
-    Returns the list of products for the store from BigQuery.
-    Maps 'product_id' to 'id' to maintain compatibility with the UI.
+    Fetches products. Defaults to the real DB fetcher, 
+    but allows a mock fetcher to be 'injected' for testing.
     """
-    # 1. Get the data from your database
-    db_products = data_fetcher.get_products()
+    # Call whatever function was passed in
+    data = fetcher() 
     
-    # 2. Rename the database key 'product_id' to 'id' so the UI still works
-    for product in db_products:
-        if "product_id" in product:
-            product["id"] = product.pop("product_id")
-            
-    return db_products
+    # Keep your mapping logic so 'product_id' becomes 'id' for the UI
+    for p in data:
+        if "product_id" in p:
+            p["id"] = p.pop("product_id")
+    return dat
 
 # ---------------------------
 # Product Data
