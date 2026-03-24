@@ -1,57 +1,86 @@
 #############################################################################
 # data_fetcher_test.py
 #
-# This file contains tests for data_fetcher.py.
-#
-# You will write these tests in Unit 3.
+# This file contains tests for data_fetcher.py using mocking to avoid 
+# real database and API calls (Safe for GitHub Actions).
 #############################################################################
 import unittest
-import data_fetcher  # Ensure this file is in the same folder
+from unittest.mock import patch
+import data_fetcher
 
 class TestDataFetcher(unittest.TestCase):
 
-    def test_get_products(self):
-        """Tests that we can fetch a list of products from BigQuery."""
+    @patch('data_fetcher.bq_client')
+    def test_get_products(self, mock_bq):
+        """Tests fetching a list of products using a mocked BigQuery client."""
+        # Create fake database rows
+        mock_bq.query.return_value.result.return_value = [
+            {"product_id": "h1", "product_name": "Mock Hat", "price": 20.0}
+        ]
+        
         products = data_fetcher.get_products()
-        # Check that it returns a list
+        
         self.assertIsInstance(products, list)
-        # If there is data, check that the first item is a dictionary
-        if len(products) > 0:
-            self.assertIsInstance(products[0], dict)
-            self.assertIn("product_id", products[0])
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0]["product_id"], "h1")
+        mock_bq.query.assert_called_once() # Ensures BigQuery was "called"
 
-    def test_get_product_by_id(self):
-        """Tests fetching a single product. 
-        Note: You'll need a real product_id from your DB for this to pass."""
-        # Replace 'hat-001' with an ID actually in your products table
+    @patch('data_fetcher.bq_client')
+    def test_get_product_by_id(self, mock_bq):
+        """Tests fetching a single product."""
         test_id = "hat-001" 
+        # Fake the response for a specific ID
+        mock_bq.query.return_value.result.return_value = [
+            {"product_id": test_id, "product_name": "Test Hat"}
+        ]
+        
         product = data_fetcher.get_product(test_id)
         
-        if product:
-            self.assertEqual(product["product_id"], test_id)
-            self.assertIn("product_name", product)
+        self.assertIsNotNone(product)
+        self.assertEqual(product["product_id"], test_id)
 
-    def test_get_user_not_found(self):
+    @patch('data_fetcher.bq_client')
+    def test_get_user_not_found(self, mock_bq):
         """Tests that a non-existent user returns None."""
+        # Fake an empty database response
+        mock_bq.query.return_value.result.return_value = []
+        
         user = data_fetcher.get_user("fake_user_id_999")
         self.assertIsNone(user)
 
-    def test_get_cart_returns_list(self):
-        """Tests that cart retrieval always returns a list, even if empty."""
+    @patch('data_fetcher.bq_client')
+    def test_get_cart_returns_list(self, mock_bq):
+        """Tests that cart retrieval returns a list."""
+        mock_bq.query.return_value.result.return_value = [{"product_id": "h1", "qty": 1}]
+        
         cart = data_fetcher.get_cart("test_user")
         self.assertIsInstance(cart, list)
 
-    def test_genai_recommendation_structure(self):
+    @patch('data_fetcher.bq_client')
+    def test_get_orders(self, mock_bq):
+        """Tests that order retrieval returns a list."""
+        mock_bq.query.return_value.result.return_value = [{"order_id": "123", "user_id": "test_user"}]
+        
+        orders = data_fetcher.get_orders("test_user")
+        self.assertIsInstance(orders, list)
+
+    # We mock the AI model, AND the cart/order functions it relies on
+    @patch('data_fetcher.genai_model')
+    @patch('data_fetcher.get_orders')
+    @patch('data_fetcher.get_cart')
+    def test_genai_recommendation_structure(self, mock_get_cart, mock_get_orders, mock_genai):
         """Tests that the AI returns the expected dictionary structure."""
-        # This will actually call Vertex AI, so it might take a second!
         user_id = "test_user"
+        
+        # Setup fake returns for the helper functions
+        mock_get_cart.return_value = []
+        mock_get_orders.return_value = []
+        mock_genai.generate_content.return_value.text = "Mocked AI Advice"
+        
         result = data_fetcher.get_genai_recommendations(user_id)
         
-        self.assertIn("user_id", result)
-        self.assertIn("recommendations", result)
         self.assertEqual(result["user_id"], user_id)
-        # Ensure recommendations is a string (since it's response.text)
-        self.assertIsInstance(result["recommendations"], str)
+        self.assertEqual(result["recommendations"], "Mocked AI Advice")
 
 if __name__ == "__main__":
     unittest.main()
