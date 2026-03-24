@@ -1,8 +1,8 @@
 #############################################################################
 # modules_test.py
 #
-# Final Unit 3 version. Uses Mocking to satisfy assignment requirements
-# and handles the "id" vs "product_id" mapping.
+# Final Unit 3 version. Uses Dependency Injection to satisfy assignment 
+# requirements and handles the "id" vs "product_id" mapping.
 #############################################################################
 
 import math
@@ -33,20 +33,22 @@ from modules import (
 
 class TestModules(unittest.TestCase):
 
-    @patch('modules.data_fetcher.get_products')
-    def test_load_products_is_valid(self, mock_get_products):
-        """Tests that load_products fetches and formats database data."""
-        # We tell the mock to return data with the 'product_id' key (DB style)
-        mock_get_products.return_value = [
-            {"product_id": "h001", "name": "Howard Cap", "price": 25.00}
-        ]
+    def test_load_products_with_injection(self):
+        """
+        Tests load_products using Dependency Injection.
+        This satisfies the requirement to refactor away from direct 
+        data_fetcher dependencies.
+        """
+        # This is our 'Mock' - a simple function that returns fake data
+        def mock_db_call():
+            return [{"product_id": "test_123", "price": 10.0}]
+
+        # INJECTION: We pass 'mock_db_call' into 'load_products'
+        # Make sure your modules.py function accepts 'fetcher' as an argument!
+        products = load_products(fetcher=mock_db_call)
         
-        products = load_products()
-        
-        # Verify the list isn't empty and keys were mapped to 'id' (UI style)
         self.assertIsInstance(products, list)
-        self.assertEqual(len(products), 1)
-        self.assertEqual(products[0]["id"], "h001") 
+        self.assertEqual(products[0]["id"], "test_123")
 
     @patch('modules.data_fetcher.get_products')
     def test_get_product_by_id_found(self, mock_get_products):
@@ -94,12 +96,8 @@ class TestModules(unittest.TestCase):
 
     def test_display_genai_advice_ui(self):
         """Tests that the UI helper for GenAI handles empty states gracefully."""
-        # Using a simple mock for the streamlit 'st' object
         with patch('modules.st') as mock_st:
-            # Call with dummy data
             display_genai_advice("2026-03-24", "Wear a hat!", None)
-            
-            # Verify that streamlit tried to write the title and advice
             mock_st.title.assert_called()
             mock_st.write.assert_called_with("Wear a hat!")
 
