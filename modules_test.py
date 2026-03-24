@@ -18,31 +18,42 @@ from modules import (
     display_genai_advice
 )
 
-REQUIRED_KEYS = {"id", "name", "description", "price", "image"}
+# Update the keys to match BigQuery
+REQUIRED_KEYS = {"product_id", "product_name", "description", "price", "image"}
 
-def test_load_products_returns_list_of_three():
-    products = load_products()
+def test_load_products_is_valid():
+    products = load_products() # This now calls data_fetcher.get_products()
     assert isinstance(products, list)
-    assert len(products) == 3
+    # Instead of '== 3', just make sure we got SOMETHING back
+    assert len(products) > 0 
 
 def test_get_product_by_id_found():
     products = load_products()
-    target = products[0]
-    found = get_product_by_id(products, target["id"])
-    assert found is not None
-    assert found["id"] == target["id"]
+    if len(products) > 0:
+        target = products[0]
+        # Use 'product_id' because that's what BigQuery uses
+        found = get_product_by_id(products, target["product_id"])
+        assert found is not None
+        assert found["product_id"] == target["product_id"]
+
+def test_calc_total_basic():
+    products = load_products()
+    if len(products) > 0:
+        first_product = products[0]
+        pid = first_product["product_id"]
+        price = first_product["price"]
+        
+        cart = {pid: 1} # Put 1 of the real product in the cart
+        total = calc_total(cart, products)
+        assert math.isclose(total, price, rel_tol=1e-9)
+
+
+
 
 def test_add_to_cart_new_item():
     cart = init_cart()
     add_to_cart(cart, "h001", qty=1)
     assert cart == {"h001": 1}
-
-def test_calc_total_basic():
-    products = load_products()
-    cart = {"h001": 1}
-    p1 = get_product_by_id(products, "h001")["price"]
-    total = calc_total(cart, products)
-    assert math.isclose(total, p1, rel_tol=1e-9)
 
 def test_checkout_message():
     # We create the 'fake' data the function needs to run
