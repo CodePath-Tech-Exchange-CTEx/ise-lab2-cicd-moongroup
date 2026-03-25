@@ -67,7 +67,7 @@ def load_products(fetcher=data_fetcher.get_products):
     for p in data:
         if "product_id" in p:
             p["id"] = p.pop("product_id")
-    return dat
+    return data
 
 # ---------------------------
 # Product Data
