@@ -73,7 +73,7 @@ if "advice_data" not in st.session_state:
 # 4. Top Navigation Bar
 top = st.columns([4, 1, 1]) 
 with top[0]:
-    st.title("HU Campus Store")
+    st.title("Campus Store")
 
 with top[1]:
     if st.button("💡 Style Coach", use_container_width=True):
@@ -106,4 +106,4 @@ elif st.session_state.page == "detail":
         st.session_state.page = "home"
         st.rerun()
 
-    product = get_product_by_id(products, st.session_state   
+    product = get_product_by_id(products, st.session_state)  
