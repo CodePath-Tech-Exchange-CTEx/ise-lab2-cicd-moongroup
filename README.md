@@ -1,4 +1,5 @@
 # ISE Lab 2: CI/CD Moon Group
+GCP-deloyment Link: https://hat-plug-64058716019.us-central1.run.app/
 
 A Streamlit-based web application demonstrating CI/CD practices
 including automated testing, containerization, and deployment using
