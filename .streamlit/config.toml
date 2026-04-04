@@ -4,3 +4,7 @@ address = '0.0.0.0'
 enableCORS = false
 enableXsrfProtection = false
 runOnSave = true
+[theme]
+base="light"
+primaryColor="#FF4B4B"
+font="sans serif"
