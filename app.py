@@ -39,6 +39,21 @@ from modules import (
     display_genai_advice,
 )
 
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+/* Apply to entire app */
+html, body, [class*="css"]  {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Optional: make headers look cleaner */
+h1, h2, h3, h4 {
+    font-weight: 600;
+}
+</style>
+""", unsafe_allow_html=True)
 # 1. Page Configuration
 st.set_page_config(page_title="HU Store", layout="wide", page_icon="🧢")
 
