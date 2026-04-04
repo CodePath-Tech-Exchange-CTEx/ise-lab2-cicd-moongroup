@@ -56,6 +56,10 @@ h1, h2, h3, h4 {
 """, unsafe_allow_html=True)
 # 1. Page Configuration
 st.set_page_config(page_title="HU Store", layout="wide", page_icon="🧢")
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
 
 # 2. Efficient Data Loading
 # This prevents the app from re-querying the database on every single click.
