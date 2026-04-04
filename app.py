@@ -4,28 +4,6 @@
 # This file contains the entrypoint for the app.
 #
 #############################################################################
-'''
-import streamlit as st
-from modules import display_my_custom_component, display_post, display_genai_advice, display_activity_summary, display_recent_workouts
-from data_fetcher import get_user_posts, get_genai_advice, get_user_profile, get_user_sensor_data, get_user_workouts
-
-userId = 'user1'
-
-
-def display_app_page():
-    """Displays the home page of the app."""
-    st.title('Welcome to SDS!')
-
-    # An example of displaying a custom component called "my_custom_component"
-    value = st.text_input('Enter your name')
-    display_my_custom_component(value)
-
-
-# This is the starting point for your app. You do not need to change these lines
-if __name__ == '__main__':
-    display_app_page()
-
-'''    
 
 import streamlit as st
 import data_fetcher  # Import to connect to BigQuery/Vertex AI
@@ -39,58 +17,62 @@ from modules import (
     display_genai_advice,
 )
 
+#  1. Page Configuration (MUST be first Streamlit command)
+st.set_page_config(page_title="HU Store", layout="wide", page_icon="🧢")
+
+#  2. Custom Font + UI Styling
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-/* Apply to entire app */
-html, body, [class*="css"]  {
+/* Apply font globally */
+html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
 }
 
-/* Optional: make headers look cleaner */
+/* Header styling */
 h1, h2, h3, h4 {
     font-weight: 600;
 }
-</style>
-""", unsafe_allow_html=True)
-# 1. Page Configuration
-st.set_page_config(page_title="HU Store", layout="wide", page_icon="🧢")
+
+/* Add spacing to main container */
 .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
 }
+</style>
+""", unsafe_allow_html=True)
 
-# 2. Efficient Data Loading
-# This prevents the app from re-querying the database on every single click.
+#  3. Efficient Data Loading
 @st.cache_data
 def get_all_products():
     return load_products()
 
 products = get_all_products()
 
-# 3. Session State Initialization
+#  4. Session State Initialization
 if "page" not in st.session_state:
     st.session_state.page = "home"
+
 if "selected_product_id" not in st.session_state:
     st.session_state.selected_product_id = None
+
 if "cart" not in st.session_state:
     st.session_state.cart = init_cart()
 
-# Fetch AI advice once per session
+#  5. Fetch AI advice once per session
 if "advice_data" not in st.session_state:
     try:
-        # Tries to get real AI recommendations for the user
         st.session_state.advice_data = data_fetcher.get_genai_recommendations("user1")
     except Exception:
-        # Fallback if the AI service is unavailable or not configured
         st.session_state.advice_data = {
             "recommendations": "Stick to the classics. A well-fitted HU cap goes with everything!",
             "user_id": "user1"
         }
 
-# 4. Top Navigation Bar
+#  6. Top Navigation Bar
 top = st.columns([4, 1, 1]) 
+
 with top[0]:
     st.title("Campus Store")
 
@@ -100,7 +82,6 @@ with top[1]:
         st.rerun()
 
 with top[2]:
-    # Dynamic cart count on the button
     cart_count = sum(st.session_state.cart.values())
     if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
         st.session_state.page = "cart"
@@ -108,11 +89,9 @@ with top[2]:
 
 st.divider()
 
-# 5. Routing Logic
-# This acts as the "Traffic Controller" for your app's different views.
+#  7. Routing Logic
 
 if st.session_state.page == "home":
-    # display_product_grid returns the ID of whatever was clicked
     clicked_id = display_product_grid(products)
     if clicked_id:
         st.session_state.selected_product_id = clicked_id
@@ -120,9 +99,23 @@ if st.session_state.page == "home":
         st.rerun()
 
 elif st.session_state.page == "detail":
-    # Navigation back button
     if st.button("⬅️ Back to Shop"):
         st.session_state.page = "home"
         st.rerun()
 
-    product = get_product_by_id(products, st.session_state)  
+    product = get_product_by_id(products, st.session_state.selected_product_id)
+    display_product_detail(product, st.session_state.cart)
+
+elif st.session_state.page == "cart":
+    if st.button("⬅️ Back to Shop"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    display_cart_page(st.session_state.cart, products)
+
+elif st.session_state.page == "advice":
+    if st.button("⬅️ Back to Shop"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    display_genai_advice(st.session_state.advice_data)
