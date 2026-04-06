@@ -17,9 +17,16 @@ PROJECT_ID=os.getenv("oluwadunsin-adesanya-fisk")
 DATASET="hat_plug"
 LOCATION="us-central1"
  
-bq_client=bigquery.Client(project=PROJECT_ID)
-vertexai.init(project=PROJECT_ID, location=LOCATION)
-genai_model=GenerativeModel("gemini-1.5-flash")
+try:
+    bq_client = bigquery.Client(project=PROJECT_ID)
+except Exception:
+    bq_client = None
+
+try:
+    vertexai.init(project=PROJECT_ID, location=LOCATION)
+    genai_model = GenerativeModel("gemini-1.5-flash")
+except Exception:
+    genai_model = None
  
 # ==============================
 # HELPER FUNCTION
@@ -27,7 +34,10 @@ genai_model=GenerativeModel("gemini-1.5-flash")
 def run_query(query, params=None):
     """Executes a query and returns clean results."""
     job_config=bigquery.QueryJobConfig(query_parameters=params or [])
-    query_job=bq_client.query(query, job_config=job_config)
+    if bq_client is None:
+        return []
+ 
+    query_job = bq_client.query(query, job_config=job_config)
     results=query_job.result()
     rows=[]
     for row in results:
@@ -123,7 +133,13 @@ def get_genai_recommendations(user_id):
     - style (e.g., streetwear, luxury, sporty)
     - reason
     """
-    response=genai_model.generate_content(prompt)
+    if genai_model is None:
+     return {
+         "user_id": user_id,
+         "recommendations": "AI not available"
+     }
+
+    response = genai_model.generate_content(prompt)
     return {
         "user_id": user_id,
         "recommendations": response.text
