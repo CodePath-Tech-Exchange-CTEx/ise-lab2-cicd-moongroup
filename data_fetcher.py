@@ -1,7 +1,8 @@
 #############################################################################
 # data_fetcher.py
+#
+# This file contains functions to fetch data needed for the app.
 #############################################################################
-
 from google.cloud import bigquery
 import vertexai
 from vertexai.generative_models import GenerativeModel, GenerationConfig
@@ -49,6 +50,7 @@ def run_query(query, params=None):
 # ==============================
 # HATS:)
 # ==============================
+
 def get_products():
     query = f"""
         SELECT *
@@ -56,7 +58,7 @@ def get_products():
         LIMIT 100
     """
     return run_query(query)
-
+ 
 def get_product(product_id):
     query = f"""
         SELECT *
@@ -69,10 +71,11 @@ def get_product(product_id):
     ]
     results = run_query(query, params)
     return results[0] if results else None
+ 
+# ==============================
+# USERS
+# ==============================
 
-# ==============================
-# WEB-USERS
-# ==============================
 def get_user(user_id):
     query = f"""
         SELECT *
@@ -85,10 +88,11 @@ def get_user(user_id):
     ]
     results = run_query(query, params)
     return results[0] if results else None
+ 
+# ==============================
+# CART
+# ==============================
 
-# ==============================
-# CART!
-# ==============================
 def get_cart(user_id):
     query = f"""
         SELECT *
@@ -99,10 +103,11 @@ def get_cart(user_id):
         bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
     ]
     return run_query(query, params)
+ 
+# ==============================
+# ORDERS
+# ==============================
 
-# ==============================
-# ORDERS!
-# ==============================
 def get_orders(user_id):
     query = f"""
         SELECT *
@@ -114,10 +119,11 @@ def get_orders(user_id):
         bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
     ]
     return run_query(query, params)
-
+ 
 # ==============================
 # AI RECOMMENDATIONS
 # ==============================
+
 def get_genai_recommendations(user_id):
     """
     Returns AI-generated hat recommendations as a structured list.
@@ -134,7 +140,7 @@ def get_genai_recommendations(user_id):
     Recommend 3 hats the user would like. 
     Return a JSON list of objects. Each object must have:
     - product_name
-    - style
+    - style (e.g., streetwear, luxury, sporty)
     - reason
     """
 
