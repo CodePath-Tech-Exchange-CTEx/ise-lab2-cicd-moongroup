@@ -6,7 +6,7 @@
 #############################################################################
 
 import streamlit as st
-import data_fetcher  # Import to connect to BigQuery/Vertex AI
+import data_fetcher 
 from modules import (
     load_products, 
     get_product_by_id,
