@@ -124,13 +124,6 @@ def get_genai_recommendations(user_id):
     """
     cart = get_cart(user_id)
     orders = get_orders(user_id)
-    
-    if not cart and not orders:
-        return {
-            "user_id": user_id,
-            "recommendations": [],
-            "message": "No history found."
-        }
 
     prompt = f"""
     You are a fashion stylist specializing in hats.
@@ -144,7 +137,7 @@ def get_genai_recommendations(user_id):
     - style
     - reason
     """
-    
+
     if not hasattr(genai_model, "generate_content"):
         return {
             "user_id": user_id,
