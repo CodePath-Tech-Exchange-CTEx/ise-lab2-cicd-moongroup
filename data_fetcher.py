@@ -141,27 +141,15 @@ def get_genai_recommendations(user_id):
     - reason
     """
     
-    if genai_model is None:
-        return {
-            "user_id": user_id,
-            "recommendations": []
-        }
-    
-    response = genai_model.generate_content(prompt)
-    
+if not hasattr(genai_model, "generate_content"):
     return {
         "user_id": user_id,
-        "recommendations": response.text
+        "recommendations": []
     }
-    if genai_model is None:
-        return {
-            "user_id": user_id,
-            "recommendations": []
-        }
-    
-    response = genai_model.generate_content(prompt)
-    
-    return {
-        "user_id": user_id,
-        "recommendations": response.text
-    }
+
+response = genai_model.generate_content(prompt)
+
+return {
+    "user_id": user_id,
+    "recommendations": response.text
+}
