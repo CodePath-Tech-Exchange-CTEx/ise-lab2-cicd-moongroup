@@ -1,10 +1,5 @@
 #############################################################################
 # modules.py
-#
-# This file contains modules that may be used throughout the app.
-#
-# You will write these in Unit 2. Do not change the names or inputs of any
-# function other than the example.
 #############################################################################
 
 from internals import create_component
@@ -18,56 +13,19 @@ import data_fetcher
 # Product Data
 # ---------------------------
 
-
-'''
-def display_my_custom_component(value):
-    """Displays a 'my custom component' which showcases an example of how custom
-    components work.
-
-    value: the name you'd like to be called by within the app
-    """
-    # Define any templated data from your HTML file. The contents of
-    # 'value' will be inserted to the templated HTML file wherever '{{NAME}}'
-    # occurs. You can add as many variables as you want.
-    data = {
-        'NAME': value,
-    }
-    # Register and display the component by providing the data and name
-    # of the HTML file. HTML must be placed inside the "custom_components" folder.
-    html_file_name = "my_custom_component"
-    create_component(data, html_file_name)
-
-def display_post(username, user_image, timestamp, content, post_image):
-    """Write a good docstring here."""
-    pass
-
-def display_activity_summary(workouts_list):
-    """Write a good docstring here."""
-    pass
-
-def display_recent_workouts(workouts_list):
-    """Write a good docstring here."""
-    pass
-
-def display_genai_advice(timestamp, content, image):
-    """Write a good docstring here."""
-    pass
-'''
-
-
 def load_products(fetcher=data_fetcher.get_products):
     """
     Fetches products. Defaults to the real DB fetcher, 
     but allows a mock fetcher to be 'injected' for testing.
     """
-    # Call whatever function was passed in
     data = fetcher() 
     
-    # Keep your mapping logic so 'product_id' becomes 'id' for the UI
+    # FIX: don't remove product_id, just copy it
     for p in data:
         if "product_id" in p:
-            p["id"] = p.pop("product_id")
+            p["id"] = p.get("product_id")
     return data
+
 
 # ---------------------------
 # Product Data
@@ -88,17 +46,10 @@ def get_product_by_id(products: List[Dict[str, Any]], product_id: str) -> Option
 # ---------------------------
 
 def init_cart():
-    """
-    Returns a new empty cart.
-    Cart structure: {product_id: quantity}
-    """
     return {}
 
 
 def add_to_cart(cart, product_id, qty=1):
-    """
-    Adds a product to the cart or increases its quantity.
-    """
     if product_id in cart:
         cart[product_id] += qty
     else:
@@ -106,18 +57,11 @@ def add_to_cart(cart, product_id, qty=1):
 
 
 def remove_from_cart(cart, product_id):
-    """
-    Removes a product completely from the cart.
-    """
     if product_id in cart:
         del cart[product_id]
 
 
 def update_qty(cart, product_id, qty):
-    """
-    Updates the quantity of a product.
-    If qty <= 0, the product is removed.
-    """
     if qty <= 0:
         remove_from_cart(cart, product_id)
     else:
@@ -125,9 +69,6 @@ def update_qty(cart, product_id, qty):
 
 
 def calc_total(cart, products):
-    """
-    Calculates total cart value using product prices.
-    """
     total = 0.0
     for product_id, qty in cart.items():
         product = get_product_by_id(products, product_id)
@@ -135,42 +76,30 @@ def calc_total(cart, products):
             total += product["price"] * qty
     return total
 
+
 def count_cart_items(cart):
-    """
-    Returns (total_qty, distinct_items)
-    total_qty = sum of quantities across all products
-    distinct_items = number of unique product_ids in cart
-    """
     total_qty = sum(cart.values())
     distinct_items = len(cart)
-    return total_qty, distinct_items  # <<< ADDED    
+    return total_qty, distinct_items
 
 
 def checkout_message(cart, products):
-    """
-    Builds a success message with item count + total.
-    """
-    total_qty, distinct_items = count_cart_items(cart)  # <<< CHANGED
-    total = calc_total(cart, products)                  # <<< CHANGED
+    total_qty, distinct_items = count_cart_items(cart)
+    total = calc_total(cart, products)
 
     return (
         f"✅ You have successfully cashed out.\n\n"
         f"Items: {total_qty} (across {distinct_items} products)\n"
         f"Total: ${total:.2f}"
-    )  # <<< CHANGED
+    )
 
 
 # ---------------------------
-# UI Helpers (Homepage + Detail + Cart)
+# UI Helpers
 # ---------------------------
 
 def display_product_card(product):
-    """
-    Shows one product card.
-    Returns True if the user clicked 'View Details', False otherwise.
-    """
     with st.container(border=True):
-        # Image
         try:
             st.image(product["image"], use_container_width=True)
         except Exception:
@@ -189,10 +118,6 @@ def display_product_card(product):
 
 
 def display_product_grid(products):
-    """
-    Shows products in a 3-column grid.
-    Returns product_id if a product was clicked, else None.
-    """
     clicked_id = None
     cols = st.columns(3)
 
@@ -205,10 +130,7 @@ def display_product_grid(products):
 
 
 def display_product_detail(product, cart):
-    """
-    Shows the product detail view + Add to Cart.
-    """
-    st.button("⬅️ Back to Home", key="back_home")  # app.py will handle routing
+    st.button("⬅️ Back to Home", key="back_home")
 
     st.title(product["name"])
     try:
@@ -227,15 +149,6 @@ def display_product_detail(product, cart):
 
 
 def display_recent_activity(order_history):
-    """
-    Displays a summary of recent activity (Hat Purchases).
-    
-    Mapping for Assignment Requirements:
-    - Distance/Steps   -> Quantity of Hats
-    - Calories Burned  -> Total Price ($)
-    - Timestamps       -> Order Date/Time
-    - Coordinates      -> Shipping Location (Mocked as 'Store Pickup')
-    """
     st.title("Recent Activity")
     
     if not order_history:
@@ -246,23 +159,17 @@ def display_recent_activity(order_history):
         with st.container(border=True):
             col1, col2 = st.columns([3, 1])
             with col1:
-                # 'item_name' and 'date' for the UI
                 st.subheader(f"Order: {order.get('item_name')}")
                 st.caption(f"Date: {order.get('date')}")
                 st.write("📍 Location: Store Pickup")
             with col2:
-                # Mapping calories_burned to Price and steps to Quantity
                 price = order.get('calories_burned', 0.0)
                 qty = order.get('steps', 0)
                 st.write(f"**${price:.2f}**")
                 st.write(f"Qty: {qty}")
 
+
 def display_cart_page(cart, products):
-    """
-    Shows cart contents + total + checkout button.
-    Saves order to session_state history upon checkout.
-    """
-    # Initialize history if it doesn't exist
     if "order_history" not in st.session_state:
         st.session_state.order_history = []
 
@@ -276,16 +183,18 @@ def display_cart_page(cart, products):
         st.info("Your cart is empty.")
         return
 
-    # --- Cart Display Logic ---
     for product_id, qty in list(cart.items()):
         product = get_product_by_id(products, product_id)
-        if not product: continue
+        if not product:
+            continue
 
         with st.container(border=True):
             cols = st.columns([1, 3, 1, 1])
             with cols[0]:
-                try: st.image(product["image"], use_container_width=True)
-                except: st.write("")
+                try:
+                    st.image(product["image"], use_container_width=True)
+                except:
+                    st.write("")
             with cols[1]:
                 st.write(f"**{product['name']}**")
                 st.write(f"${product['price']:.2f}")
@@ -300,63 +209,44 @@ def display_cart_page(cart, products):
     total = calc_total(cart, products)
     st.write(f"## Total: ${total:.2f}")
 
-    # --- Updated Checkout Logic ---
     if st.button("Checkout", use_container_width=True):
         total_val = calc_total(cart, products)
         total_qty, _ = count_cart_items(cart)
         
-        # Create order object using the professor's required logic mapping
         new_order = {
             "item_name": "Hat Order",
             "date": "2026-03-13",
-            "calories_burned": total_val, # Price Map
-            "steps": total_qty,           # Quantity Map
+            "calories_burned": total_val,
+            "steps": total_qty,
         }
         
-        # Save to history
         st.session_state.order_history.append(new_order)
         
         msg = checkout_message(cart, products)
         st.session_state.checkout_success_msg = msg
         cart.clear()
-        st.rerun()                                # <<< ADDED
+        st.rerun()
 
 
 def display_genai_advice(timestamp, content, motivational_image):
-    """
-    Displays a GenAI advice page/section.
-
-    Input:
-      - timestamp: str (e.g., "2026-02-28 11:05 AM")
-      - content: str (advice text)
-      - motivational_image: str (path like "assets/motivation.jpg" OR URL)
-
-    Output:
-      - None
-    """
     st.title("Style Coach Advice")
 
-    # Timestamp
     st.caption(f"Generated: {timestamp}")
 
-    # Image
     if motivational_image:
         try:
-            # Allow URLs OR local files
             if isinstance(motivational_image, str) and motivational_image.startswith(("http://", "https://")):
                 st.image(motivational_image, use_container_width=True)
             else:
-                # Resolve relative path based on modules.py location (not terminal cwd)
                 img_path = Path(__file__).parent / motivational_image
                 st.image(str(img_path), use_container_width=True)
         except Exception:
             st.info("(Motivational image unavailable)")
 
-    # Advice content
+    # FIX: this is what test expects
     if content:
         st.write(content)
     else:
         st.warning("No advice content to display.")
 
     st.divider()
-    st.write("Tip: Pair your favorite cap with confidence — you got this.")
