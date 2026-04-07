@@ -153,10 +153,15 @@ def get_genai_recommendations(user_id):
         "user_id": user_id,
         "recommendations": response.text
     }
-    try:
-        response = genai_model.generate_content(prompt)
-    except Exception as e:
+    if genai_model is None:
         return {
             "user_id": user_id,
             "recommendations": []
         }
+    
+    response = genai_model.generate_content(prompt)
+    
+    return {
+        "user_id": user_id,
+        "recommendations": response.text
+    }
