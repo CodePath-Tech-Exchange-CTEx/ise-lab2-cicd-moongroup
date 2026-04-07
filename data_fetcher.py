@@ -153,6 +153,10 @@ def get_genai_recommendations(user_id):
         "user_id": user_id,
         "recommendations": response.text
     }
+    try:
+        response = genai_model.generate_content(prompt)
     except Exception as e:
-        print(f"AI Generation Error: {e}")
-        return {"user_id": user_id, "recommendations": [], "error": str(e)}
+        return {
+            "user_id": user_id,
+            "recommendations": []
+        }
