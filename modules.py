@@ -13,19 +13,17 @@ import data_fetcher
 # Product Data
 # ---------------------------
 
-def load_products(fetcher=data_fetcher.get_products):
-    """
-    Fetches products. Defaults to the real DB fetcher, 
-    but allows a mock fetcher to be 'injected' for testing.
-    """
-    data = fetcher() 
-    
-    # FIX: don't remove product_id, just copy it
+def load_products(fetcher=None):
+    if fetcher is None:
+        fetcher = data_fetcher.get_products
+
+    data = fetcher()
+
     for p in data:
         if "product_id" in p:
             p["id"] = p.get("product_id")
-    return data
 
+    return data
 
 # ---------------------------
 # Product Data
