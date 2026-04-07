@@ -142,22 +142,17 @@ def get_genai_recommendations(user_id):
     """
     
     if genai_model is None:
-        return {"user_id": user_id, "recommendations": "AI Service Offline"}
-
-    try:
-        # Using GenerationConfig ensures the model strictly returns valid JSON
-        response = genai_model.generate_content(
-            prompt,
-            generation_config=GenerationConfig(response_mime_type="application/json")
-        )
-        
-        # Load the string response into a Python list
-        recommendations_data = json.loads(response.text)
-        
         return {
             "user_id": user_id,
-            "recommendations": recommendations_data
+            "recommendations": []
         }
+    
+    response = genai_model.generate_content(prompt)
+    
+    return {
+        "user_id": user_id,
+        "recommendations": response.text
+    }
     except Exception as e:
         print(f"AI Generation Error: {e}")
         return {"user_id": user_id, "recommendations": [], "error": str(e)}
