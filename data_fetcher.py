@@ -38,14 +38,14 @@ def run_query(query, params=None):
         return []
 
     job_config = bigquery.QueryJobConfig(query_parameters=params or [])
-    try:
-        query_job = bq_client.query(query, job_config=job_config)
-        results = query_job.result()
-        return [dict(row) for row in results]
-    except Exception as e:
-        print(f"Query Error: {e}")
-        return []
+    query_job = bq_client.query(query, job_config=job_config)
+    results = query_job.result()
 
+    rows = []
+    for row in results:
+        rows.append(dict(row))
+
+    return rows
 # ==============================
 # HATS:)
 # ==============================
