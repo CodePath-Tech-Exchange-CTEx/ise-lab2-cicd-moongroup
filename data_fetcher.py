@@ -12,7 +12,7 @@ import json
 # FIX: os.getenv looks for the KEY name. 
 # We'll default to your project ID if the environment variable isn't set.
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "oluwadunsin-adesanya-fisk")
-DATASET = "hat_plug"
+DATASET = "hatplugquery"
 LOCATION = "us-central1"
 
 # Initialize Clients
