@@ -175,6 +175,26 @@ def display_product_detail(product: Dict, cart: Dict):
 # Cart UI
 # ---------------------------
 
+def display_recent_activity(order_history):
+    st.title("Recent Activity")
+    
+    if not order_history:
+        st.info("No recent purchases yet.")
+        return
+
+    for order in order_history:
+        with st.container(border=True):
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.subheader(f"Order: {order.get('item_name')}")
+                st.caption(f"Date: {order.get('date')}")
+                st.write("📍 Location: Store Pickup")
+            with col2:
+                price = order.get('calories_burned', 0.0)
+                qty = order.get('steps', 0)
+                st.write(f"**${price:.2f}**")
+                st.write(f"Qty: {qty}")
+
 def display_cart_page(cart: Dict, products: List[Dict], user_id: str = "user1"):
     """
     Shows cart contents, totals, and checkout.
@@ -198,28 +218,6 @@ def display_cart_page(cart: Dict, products: List[Dict], user_id: str = "user1"):
     if not cart:
         st.info("Your cart is empty. Head back to the catalog to add some hats!")
         return
-
-
-def display_recent_activity(order_history):
-    st.title("Recent Activity")
-    
-    if not order_history:
-        st.info("No recent purchases yet.")
-        return
-
-    for order in order_history:
-        with st.container(border=True):
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.subheader(f"Order: {order.get('item_name')}")
-                st.caption(f"Date: {order.get('date')}")
-                st.write("📍 Location: Store Pickup")
-            with col2:
-                price = order.get('calories_burned', 0.0)
-                qty = order.get('steps', 0)
-                st.write(f"**${price:.2f}**")
-                st.write(f"Qty: {qty}")
-
 
     # --- Line items ---
     for product_id, qty in list(cart.items()):
