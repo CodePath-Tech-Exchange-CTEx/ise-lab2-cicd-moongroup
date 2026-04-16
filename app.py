@@ -29,6 +29,40 @@ from data_fetcher import (
 # Config
 # ─────────────────────────────────────────────
 st.set_page_config(page_title="Hat Plug", layout="wide")
+st.markdown("""
+<style>
+body {
+    background-color: #f5f5f5;
+}
+
+.main {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+}
+
+.card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.advice-text {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+}
+</style>
+""", unsafe_allow_html=True)
+#  1. Page Configuration (MUST be first Streamlit command)
+st.set_page_config(page_title="HU Store", layout="wide", page_icon="🧢")
 
 USER_ID = "user1"
 DEFAULT_IMAGE = "https://via.placeholder.com/300x300?text=No+Image"
@@ -276,3 +310,12 @@ elif st.session_state.page == "advice":
         st.session_state.advice_content,
         st.session_state.advice_image,
     )
+    if "advice_data" not in st.session_state:
+        st.session_state.advice_data = None
+
+    display_genai_advice(
+        None,  # timestamp (missing in my data)
+        data.get("recommendations"),
+        "https://i.pinimg.com/736x/3c/8a/ea/3c8aea98d9047f1fc9cc08c730b88c30.jpg"
+    )
+ 
