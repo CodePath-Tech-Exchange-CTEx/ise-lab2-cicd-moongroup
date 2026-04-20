@@ -14,4 +14,4 @@ COPY . ./
 RUN pip install -r requirements.txt
 
 # The main command to run when the container starts.
-ENTRYPOINT ["streamlit", "run", "app.py"]
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0"]
