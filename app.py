@@ -310,12 +310,5 @@ elif st.session_state.page == "advice":
         st.session_state.advice_content,
         st.session_state.advice_image,
     )
-    if "advice_data" not in st.session_state:
-        st.session_state.advice_data = None
-
-    display_genai_advice(
-        None,  # timestamp (missing in my data)
-        data.get("recommendations"),
-        "https://i.pinimg.com/736x/3c/8a/ea/3c8aea98d9047f1fc9cc08c730b88c30.jpg"
-    )
+    
  
