@@ -1,6 +1,6 @@
 ### VARIABLES TO CHANGE - START
 PROJECT_ID='oluwadunsin-adesanya-fisk'
-SERVICE_NAME='moon-website'
+SERVICE_NAME='hatplug'
 ### VARIABLES TO CHANGE - END
 
 # ----------- Manual Deployment ------------ #

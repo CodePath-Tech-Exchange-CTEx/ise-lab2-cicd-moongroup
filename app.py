@@ -178,7 +178,7 @@ if "advice_content" not in st.session_state:
     )
 
 if "advice_image" not in st.session_state:
-    st.session_state.advice_image = "assets/motivation.JPG"
+    st.session_state.advice_image = "assets/coach.jpg"
 
 
 # ─────────────────────────────────────────────
