@@ -3,7 +3,7 @@
 #
 # This file contains modules that may be used throughout the app.
 #############################################################################
-
+import os
 import streamlit as st
 from typing import List, Dict, Optional, Any
 from pathlib import Path
@@ -204,7 +204,16 @@ def display_product_card(product: Dict) -> bool:
         st.markdown('<div class="hs-card">', unsafe_allow_html=True)
  
         try:
-            st.image(product["image"], use_container_width=True)
+            image_path = os.path.join("assets", product["image"])
+            if os.path.exists(image_path):
+                st.image(image_path, use_container_width=True)
+            else:
+                st.markdown(
+                    '<div style="height:160px;background:#EFE8DC;border-radius:8px 8px 0 0;'
+                    'display:flex;align-items:center;justify-content:center;'
+                    'color:#A0785A;font-size:13px;">Image unavailable</div>',
+                    unsafe_allow_html=True,
+                )
         except Exception:
             st.markdown(
                 '<div style="height:160px;background:#EFE8DC;border-radius:8px 8px 0 0;'
@@ -285,7 +294,16 @@ def display_product_detail(product: Dict, cart: Dict):
  
     with img_col:
         try:
-            st.image(product["image"], use_container_width=True)
+            image_path = os.path.join("assets", product["image"])
+            if os.path.exists(image_path):
+                st.image(image_path, use_container_width=True)
+            else:
+                st.markdown(
+                    '<div style="height:300px;background:#EFE8DC;border-radius:10px;'
+                    'display:flex;align-items:center;justify-content:center;'
+                    'color:#A0785A;">Image unavailable</div>',
+                    unsafe_allow_html=True,
+                )
         except Exception:
             st.markdown(
                 '<div style="height:300px;background:#EFE8DC;border-radius:10px;'

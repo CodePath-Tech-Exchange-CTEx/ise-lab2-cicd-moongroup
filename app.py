@@ -4,7 +4,7 @@
 # Entrypoint for the Hat Plug Streamlit app.
 # Connects live BigQuery data to all UI components.
 #############################################################################
-
+import os
 import streamlit as st
 from datetime import datetime
 
