@@ -219,7 +219,7 @@ def get_genai_recommendations(user_id):
     try:
         recommendations = json.loads(response.text)
     except:
-        recommendations = []
+        recommendations = response.text  
 
     return {
         "user_id": user_id,
