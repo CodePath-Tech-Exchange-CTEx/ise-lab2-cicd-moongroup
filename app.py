@@ -17,6 +17,7 @@ from modules import (
     display_cart_page,
     display_orders_page,       # ← now lives in modules.py
     display_genai_advice,
+    display_reviews_section,
 )
 from data_fetcher import (
     get_products,
@@ -180,11 +181,67 @@ if "advice_content" not in st.session_state:
 if "advice_image" not in st.session_state:
     st.session_state.advice_image = "assets/coach.jpg"
 
+if "reviews" not in st.session_state:
+    st.session_state.reviews = {
+        "h001": [
+            {
+                "name": "Alex M.",
+                "email": "alex@email.com",
+                "rating": 5,
+                "text": "Great quality and the fit was perfect.",
+                "verified": True,
+                "fit": "Excellent",
+                "quality": "Excellent",
+                "shipping": "Fast",
+            },
+            {
+                "name": "Jordan T.",
+                "email": "jordan@email.com",
+                "rating": 4,
+                "text": "Nice hat and arrived on time.",
+                "verified": False,
+                "fit": "Good",
+                "quality": "Good",
+                "shipping": "On time",
+            }
+        ]
+    }    
+
 
 # ─────────────────────────────────────────────
 # Load live product data (every render)
 # ─────────────────────────────────────────────
 
+def load_live_products():
+    """Fetches all products from BigQuery and normalises them."""
+    try:
+        rows = get_products()
+        return normalize_products(rows)
+    except Exception as e:
+        st.warning(f"Could not load products from the database: {e}")
+        return [
+            {
+                "id": "h001",
+                "name": "Howard Classic Cap",
+                "description": "A classic maroon Howard cap with everyday style.",
+                "price": 35.00,
+                "image": DEFAULT_IMAGE,
+            },
+            {
+                "id": "h002",
+                "name": "Bison Snapback",
+                "description": "Structured snapback with a clean streetwear look.",
+                "price": 40.00,
+                "image": DEFAULT_IMAGE,
+            },
+            {
+                "id": "h003",
+                "name": "HU Vintage Hat",
+                "description": "Vintage-inspired cap with a relaxed fit.",
+                "price": 32.00,
+                "image": DEFAULT_IMAGE,
+            },
+        ]
 products = load_live_products()
 
 
@@ -253,15 +310,7 @@ elif st.session_state.page == "detail":
 
         display_product_detail(product, st.session_state.cart)
 
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("💡 Get Style Advice", use_container_width=True):
-                st.session_state.page = "advice"
-                st.rerun()
-        with col2:
-            if st.button("🛒 Go to Cart", use_container_width=True):
-                st.session_state.page = "cart"
-                st.rerun()
+        display_reviews_section(product["id"])
 
 
 # ── Cart ─────────────────────────────────────
@@ -310,5 +359,4 @@ elif st.session_state.page == "advice":
         st.session_state.advice_content,
         st.session_state.advice_image,
     )
-    
  

@@ -326,7 +326,109 @@ def display_product_detail(product: Dict, cart: Dict):
             add_to_cart(cart, product["id"], int(qty))
             st.success(f"Added {int(qty)}× {product['name']} to your cart.")
  
- 
+# ---------------------------
+# Review section UI
+# ---------------------------
+
+def display_reviews_section(product_id: str):
+    """Shows recent reviews first, then the review form."""
+    inject_css()
+
+    st.divider()
+    st.markdown('<p class="hs-eyebrow">Customer feedback</p>', unsafe_allow_html=True)
+    st.subheader("Reviews")
+
+    if "reviews" not in st.session_state:
+        st.session_state.reviews = {}
+
+    if product_id not in st.session_state.reviews:
+        st.session_state.reviews[product_id] = []
+
+    product_reviews = st.session_state.reviews.get(product_id, [])
+
+    # Recent reviews first
+    st.markdown("### Recent reviews")
+
+    if not product_reviews:
+        st.info("No reviews yet.")
+    else:
+        for review in reversed(product_reviews):
+            verified_tag = "✅ Verified" if review["verified"] else "❌ Non-verified"
+            stars = "⭐" * review["rating"]
+
+            st.markdown(
+                f"""
+**{review['name']}** — {verified_tag}  
+{stars}  
+{review['text']}  
+
+**Fit:** {review['fit']} | **Quality:** {review['quality']} | **Shipping:** {review['shipping']}
+"""
+            )
+            st.divider()
+
+    # Leave a review form second
+    st.subheader("Leave a review")
+
+    st.markdown("### Select rating")
+    rating = st.slider("Rating", 1, 5, 5, key=f"rating_{product_id}")
+    st.write("⭐" * rating)
+
+    st.markdown("Tell others about your experience")
+    review_text = st.text_area(
+        "",
+        key=f"review_text_{product_id}"
+    )
+
+    col1, col2 = st.columns(2)
+    with col1:
+        reviewer_name = st.text_input("Your name", key=f"name_{product_id}")
+    with col2:
+        reviewer_email = st.text_input("Your email", key=f"email_{product_id}")
+
+    st.markdown("## Review details")
+    d1, d2, d3 = st.columns(3)
+
+    with d1:
+        fit = st.selectbox(
+            "Fit",
+            ["Poor", "Okay", "Good", "Excellent"],
+            key=f"fit_{product_id}"
+        )
+
+    with d2:
+        quality = st.selectbox(
+            "Quality",
+            ["Poor", "Okay", "Good", "Excellent"],
+            key=f"quality_{product_id}"
+        )
+
+    with d3:
+        shipping = st.selectbox(
+            "Shipping",
+            ["Slow", "On time", "Fast"],
+            key=f"shipping_{product_id}"
+        )
+
+    verified = st.checkbox("Verified purchase", key=f"verified_{product_id}")
+
+    if st.button("Submit review", key=f"submit_review_{product_id}"):
+        if review_text.strip() and reviewer_name.strip():
+            st.session_state.reviews[product_id].append({
+                "name": reviewer_name,
+                "email": reviewer_email,
+                "rating": rating,
+                "text": review_text,
+                "verified": verified,
+                "fit": fit,
+                "quality": quality,
+                "shipping": shipping,
+            })
+            st.success("Review submitted!")
+            st.rerun()
+        else:
+            st.warning("Please enter your name and your review before submitting.")
+
 # ---------------------------
 # Cart UI
 # ---------------------------

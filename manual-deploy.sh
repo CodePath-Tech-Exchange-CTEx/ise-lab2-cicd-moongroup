@@ -1,6 +1,6 @@
 ### VARIABLES TO CHANGE - START
 PROJECT_ID='oluwadunsin-adesanya-fisk'
-SERVICE_NAME='hatplug'
+SERVICE_NAME='hat-plug'
 ### VARIABLES TO CHANGE - END
 
 # ----------- Manual Deployment ------------ #
