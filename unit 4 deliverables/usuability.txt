@@ -1,0 +1,85 @@
+USABILITY TEST – REVIEW / Q&A FEATURE
+
+-----------------------------------
+Intro
+-----------------------------------
+We are a team building an online hat store. The feature being tested allows users to view reviews, ask questions, and leave feedback on products.
+
+The participant will act as a customer interested in purchasing a hat. They should think out loud while interacting with the prototype and explain their thoughts before taking actions.
+
+-----------------------------------
+Tasks
+-----------------------------------
+Task 1:
+You are interested in buying a hat but want to learn more about it before making a decision. Try to find information from other customers about the product.
+
+Task 2:
+You have a question about the product regarding returns or exchanges. Try to find where you would ask this question and how you would do it.
+
+Task 3:
+You have already purchased the product and want to share your experience. Try to leave feedback for others.
+
+-----------------------------------
+Notes
+-----------------------------------
+
+Participant 1:
+- Looked for guidance on hat sizing and how it would fit their head
+- Asked about returns, refunds, and exchange process
+- Focused on scrolling through reviews to decide if they were good or bad
+- Expected basic product questions to already be answered
+
+Participant 2:
+- Noticed difference between verified and non-verified users
+- Liked filtering options but wanted more specific filtering
+- Asked for more detailed fit information (especially for head shape)
+- Suggested having a size chart or clearer description
+
+-----------------------------------
+Feedback
+-----------------------------------
+
+Participant 1:
+- Wanted a clearer process for returns and exchanges
+- Expected answers to common questions without needing to ask
+- Suggested adding more structured product-related information
+
+Participant 2:
+- Found filters helpful but wanted more specific categories
+- Said knowing if a reviewer is verified is important for trust
+- Wanted better guidance on choosing the right size
+
+-----------------------------------
+Results
+-----------------------------------
+
+Issue 1: Lack of sizing guidance
+- Users were unsure how to choose the correct hat size
+- Hypothesis: The product page does not provide enough fit-related information
+- Remedy: Add a size chart or model that helps relate hat size to head shape
+
+Issue 2: Confusion around Q&A vs Reviews
+- Users were unsure where to ask questions or leave feedback
+- Quote: “I don’t know if I should ask here or leave a review”
+- Hypothesis: The label “Q&A” is unclear
+- Remedy: Rename section to “Help / Leave a Review”
+
+Issue 3: Lack of trust in reviews
+- Users cared about whether reviews were from verified buyers
+- Quote: “I would trust this more if I knew they bought it”
+- Hypothesis: No distinction reduces credibility
+- Remedy: Add verified vs non-verified labels
+
+Issue 4: Need for better interaction
+- Users wanted responses to questions
+- Quote: “It would be better if the company could reply under this”
+- Hypothesis: Static reviews limit engagement
+- Remedy: Implement chat/thread-style responses under questions
+
+-----------------------------------
+Updates (Based on Feedback)
+-----------------------------------
+- Added size chart / sizing guidance for hats
+- Renamed Q&A section to “Help / Leave a Review”
+- Planned verified customer labels for reviews
+- Designed chat-style reply system for questions

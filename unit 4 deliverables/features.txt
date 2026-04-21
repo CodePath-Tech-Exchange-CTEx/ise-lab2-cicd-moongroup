@@ -1,0 +1,64 @@
+FEATURE: Review / Q&A System
+
+Description:
+This feature allows users to view reviews, ask questions, and leave feedback directly on a product page. It helps users make informed decisions before purchasing a hat.
+
+-----------------------------------
+Core Functionality
+-----------------------------------
+
+1. View Reviews
+- Users can scroll through reviews on the product page
+- Reviews include details such as:
+  - Hat size / fit
+  - Quality
+  - Accuracy to product images
+  - Shipping experience
+
+2. Leave a Review
+- Users can submit their own review at the bottom of the product page
+- The page is designed to end with the review section to encourage interaction
+
+3. Ask Questions (Q&A)
+- Users can ask questions about the product (e.g., returns, exchanges, fit)
+- Common use cases:
+  - “How do I return this item?”
+  - “Can I exchange this if it doesn’t fit?”
+  - “What size is best for my head shape?”
+
+-----------------------------------
+Enhancements from Usability Testing
+-----------------------------------
+
+4. Size Guidance
+- Add a model or size chart to help users relate hat size to their head
+- Provides guidance for different head shapes (e.g., rounder head)
+
+5. Verified Reviews
+- Distinguish between verified and non-verified customers
+- Improves trust and credibility of reviews
+
+6. Improved Labeling
+- Rename “Q&A” section to “Help / Leave a Review”
+- Makes purpose clearer to users
+
+7. Filtering Reviews
+- Allow users to filter reviews based on:
+  - Fit
+  - Quality
+  - Rating
+- Helps users quickly find relevant feedback
+
+8. Chat-Style Interaction
+- Questions and answers appear in a thread format
+- Company responses show below the original question
+- Enables ongoing interaction between users and the company
+
+9. FAQ Support
+- System displays answers to frequently asked questions
+- Reduces need for repeated questions about returns, exchanges, etc.
+
+-----------------------------------
+Goal
+-----------------------------------
+The goal of this feature is to improve user confidence, provide detailed product insight, and create an interactive space for feedback and support.
