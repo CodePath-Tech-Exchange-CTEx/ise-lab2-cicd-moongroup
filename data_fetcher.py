@@ -28,7 +28,7 @@ except Exception as e:
 
 try:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
-    genai_model = GenerativeModel("gemini-1.5-pro")
+    genai_model = GenerativeModel("gemini-2.5-flash-lite")
 except Exception as e:
     print(f"Vertex AI Init Error: {e}")
     genai_model = None
@@ -190,25 +190,27 @@ def create_order(user_id, product_id, quantity):
 # ==============================
 # AI RECOMMENDATIONS
 # ==============================
-def get_genai_recommendations(user_id):
-    cart = get_cart(user_id)
+def get_genai_recommendations(user_id, cart_items=None):
+    cart = cart_items if cart_items is not None else get_cart(user_id)
     orders = get_orders(user_id)
 
     prompt = f"""
     You are a fashion stylist specializing in hats.
 
-    User Cart:
+    The user currently has these hats in their cart:
     {cart}
 
-    Previous Orders:
+    They have previously ordered these hats:
     {orders}
 
-    Recommend 3 hats the user would like.
+    Give personalised style advice ONLY based on the hats above.
+    Do not recommend new hats to buy. Instead:
+    - Suggest outfits, occasions, or looks that suit the hats they already own or are buying
+    - Point out how their hats can be mixed and matched
+    - Give one specific tip per hat if possible
 
-    Return JSON list with:
-    - product_name
-    - style
-    - reason
+    Keep the tone friendly, confident, and concise.
+    If the cart and order history are both empty, politely tell the user to add some hats first before asking for style advice.
     """
 
     if genai_model is None:
