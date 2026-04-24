@@ -1,0 +1,65 @@
+Description:
+This feature allows users to filter hats based on preferences such as price, color, style, and availability. It helps users quickly narrow down products and find items that match their needs without unnecessary browsing.
+
+-----------------------------------
+Core Functionality
+-----------------------------------
+
+1. Price Filtering
+
+Users can set a minimum and maximum price range
+Preset ranges are also available (e.g., $0–$25, $25–$50, $50+)
+Ensures users stay within budget
+
+2. Color Filtering
+
+Users can select one or multiple colors
+Products update to show only selected colors
+Visual color swatches improve usability
+
+3. Style Filtering
+
+Users can filter by hat type
+Examples:
+Snapbacks
+Trucker hats
+Helps users match preferences quickly
+
+4. Availability Filtering (In/Out of Stock)
+
+Users can choose to view:
+In-stock items only
+Out-of-stock items
+All items
+Prevents wasted time on unavailable products
+-----------------------------------
+Enhancements from Usability Testing
+-----------------------------------
+
+5. Multi-Filter Combination
+
+Users can apply multiple filters at once
+Example: Black + Beanie + Under $30 + In Stock
+
+6. Real-Time Updates
+
+Results update instantly when filters are selected
+No page reload required
+
+7. Clear Filter Option
+
+“Clear All Filters” button resets selections
+
+8. Filter Visibility
+
+Active filters are displayed at the top
+Users can remove filters individually
+
+9. Mobile-Friendly Design
+
+Filters collapse into a dropdown/sidebar on smaller screens
+-----------------------------------
+Goal
+-----------------------------------
+
+The goal of this feature is to make product discovery faster, more efficient, and tailored to each user’s preferences.
