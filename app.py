@@ -16,6 +16,7 @@ from modules import (
     display_cart_page,
     display_orders_page,
     display_genai_advice,
+    display_qa_section,
     display_reviews_section,
     inject_css,
 )
@@ -211,7 +212,6 @@ if "reviews" not in st.session_state:
         ]
     }
 
-
 # ─────────────────────────────────────────────
 # Load products (every render)
 # ─────────────────────────────────────────────
@@ -283,7 +283,22 @@ elif st.session_state.page == "detail":
             st.rerun()
 
         display_product_detail(product, st.session_state.cart)
+        display_qa_section(
+            product_id=st.session_state.selected_product_id,
+            current_user=USER_ID,
+        )
+
         display_reviews_section(product["id"])
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("💡 Get Style Advice", use_container_width=True):
+                st.session_state.page = "advice"
+                st.rerun()
+        with col2:
+            if st.button("🛒 Go to Cart", use_container_width=True):
+                st.session_state.page = "cart"
+                st.rerun()
 
 
 # ── Cart ──────────────────────────────────────
@@ -330,3 +345,4 @@ elif st.session_state.page == "advice":
         st.session_state.advice_content,
         st.session_state.advice_image,
     )
+

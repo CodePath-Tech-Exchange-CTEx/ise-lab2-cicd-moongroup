@@ -227,3 +227,101 @@ def get_genai_recommendations(user_id, cart_items=None):
         "user_id": user_id,
         "recommendations": recommendations
     }
+
+# ==============================
+# Q&A
+# ==============================
+
+def get_questions(product_id):
+    """Returns all top-level questions for a product, newest first."""
+    query = f"""
+        SELECT *
+        FROM `{PROJECT_ID}.{DATASET}.product_qa`
+        WHERE product_id = @product_id
+          AND parent_question_id IS NULL
+          AND parent_answer_id IS NULL
+        ORDER BY created_at DESC
+    """
+    params = [bigquery.ScalarQueryParameter("product_id", "STRING", product_id)]
+    return run_query(query, params)
+
+
+def get_answers(question_id):
+    """Returns all answers for a given question."""
+    query = f"""
+        SELECT *
+        FROM `{PROJECT_ID}.{DATASET}.product_qa`
+        WHERE parent_question_id = @question_id
+          AND parent_answer_id IS NULL
+        ORDER BY created_at ASC
+    """
+    params = [bigquery.ScalarQueryParameter("question_id", "STRING", question_id)]
+    return run_query(query, params)
+
+
+def get_replies(answer_id):
+    """Returns all thread replies for a given answer."""
+    query = f"""
+        SELECT *
+        FROM `{PROJECT_ID}.{DATASET}.product_qa`
+        WHERE parent_answer_id = @answer_id
+        ORDER BY created_at ASC
+    """
+    params = [bigquery.ScalarQueryParameter("answer_id", "STRING", answer_id)]
+    return run_query(query, params)
+
+
+def add_question(product_id, question_text, author):
+    """Inserts a new question."""
+    query = f"""
+        INSERT INTO `{PROJECT_ID}.{DATASET}.product_qa`
+          (qa_id, product_id, author, body, parent_question_id, parent_answer_id, created_at)
+        VALUES
+          (GENERATE_UUID(), @product_id, @author, @body, NULL, NULL, CURRENT_TIMESTAMP())
+    """
+    params = [
+        bigquery.ScalarQueryParameter("product_id", "STRING", product_id),
+        bigquery.ScalarQueryParameter("author",     "STRING", author),
+        bigquery.ScalarQueryParameter("body",       "STRING", question_text),
+    ]
+    run_query(query, params)
+
+
+def add_answer(question_id, answer_text, author):
+    """Inserts an answer to a question."""
+    query = f"""
+        INSERT INTO `{PROJECT_ID}.{DATASET}.product_qa`
+          (qa_id, product_id, author, body, parent_question_id, parent_answer_id, created_at)
+        VALUES (
+          GENERATE_UUID(),
+          (SELECT product_id FROM `{PROJECT_ID}.{DATASET}.product_qa`
+           WHERE qa_id = @question_id LIMIT 1),
+          @author, @body, @question_id, NULL, CURRENT_TIMESTAMP()
+        )
+    """
+    params = [
+        bigquery.ScalarQueryParameter("question_id", "STRING", question_id),
+        bigquery.ScalarQueryParameter("author",      "STRING", author),
+        bigquery.ScalarQueryParameter("body",        "STRING", answer_text),
+    ]
+    run_query(query, params)
+
+
+def add_reply(answer_id, reply_text, author):
+    """Inserts a thread reply under an answer."""
+    query = f"""
+        INSERT INTO `{PROJECT_ID}.{DATASET}.product_qa`
+          (qa_id, product_id, author, body, parent_question_id, parent_answer_id, created_at)
+        VALUES (
+          GENERATE_UUID(),
+          (SELECT product_id FROM `{PROJECT_ID}.{DATASET}.product_qa`
+           WHERE qa_id = @answer_id LIMIT 1),
+          @author, @body, NULL, @answer_id, CURRENT_TIMESTAMP()
+        )
+    """
+    params = [
+        bigquery.ScalarQueryParameter("answer_id", "STRING", answer_id),
+        bigquery.ScalarQueryParameter("author",    "STRING", author),
+        bigquery.ScalarQueryParameter("body",      "STRING", reply_text),
+    ]
+    run_query(query, params)

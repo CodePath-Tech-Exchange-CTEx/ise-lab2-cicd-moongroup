@@ -678,3 +678,121 @@ def display_genai_advice(timestamp: str, content: str, motivational_image: str):
 
     st.divider()
     st.caption("Tip: Pair your favorite cap with confidence — you got this. 🧢")
+
+# ==============================
+# Q&A 
+# ==============================
+
+def display_qa_section(product_id: str, current_user: str = "guest"):
+    """
+    Full Q&A section for a product detail page.
+    Styled to match the existing boutique hat-shop design.
+
+    Call this in app.py inside the 'detail' block,
+    right after display_reviews_section().
+    """
+    from data_fetcher import (
+        get_questions, get_answers, get_replies,
+        add_question, add_answer, add_reply,
+    )
+
+    inject_css()
+
+    st.divider()
+    st.markdown('<p class="hs-eyebrow">Community</p>', unsafe_allow_html=True)
+    st.subheader("Questions & Answers")
+
+    # ── Ask a question ──
+    with st.form(key=f"qa_ask_{product_id}", clear_on_submit=True):
+        new_q = st.text_area(
+            "Have a question about this product?",
+            height=80,
+            placeholder="e.g. Does this hat run small? Is it waterproof?",
+        )
+        if st.form_submit_button("Submit Question"):
+            if new_q.strip():
+                add_question(product_id, new_q.strip(), current_user)
+                st.success("Your question has been posted!")
+                st.rerun()
+            else:
+                st.warning("Please enter a question before submitting.")
+
+    st.markdown("---")
+
+    # ── Fetch & display questions ──
+    questions = get_questions(product_id)
+
+    if not questions:
+        st.info("No questions yet — be the first to ask!")
+        return
+
+    st.caption(f"{len(questions)} question(s)")
+
+    for q in questions:
+        q_id   = q["qa_id"]
+        q_body = q.get("body", "")
+        q_auth = q.get("author", "anonymous")
+        q_time = str(q.get("created_at", ""))[:16]
+
+        with st.container():
+            st.markdown(f"**Q: {q_body}**")
+            st.caption(f"Asked by **{q_auth}** · {q_time}")
+
+            answers = get_answers(q_id)
+
+            if answers:
+                for ans in answers:
+                    a_id   = ans["qa_id"]
+                    a_body = ans.get("body", "")
+                    a_auth = ans.get("author", "anonymous")
+                    a_time = str(ans.get("created_at", ""))[:16]
+
+                    # Answer bubble — reuses hs-coach-tip style
+                    st.markdown(
+                        f"""<div class="hs-coach-tip">
+                            <strong>A:</strong> {a_body}<br>
+                            <small style="color:#7B5B3A;">— {a_auth} · {a_time}</small>
+                        </div>""",
+                        unsafe_allow_html=True,
+                    )
+
+                    # Thread replies
+                    replies = get_replies(a_id)
+                    for reply in replies:
+                        st.markdown(
+                            f"""<div style="background:#FAF6F0;border-left:3px solid #C8B89A;
+                                            padding:6px 12px;border-radius:0 6px 6px 0;
+                                            margin:4px 0 4px 24px;">
+                                <strong>↩</strong> {reply.get('body', '')}<br>
+                                <small style="color:#A0785A;">
+                                    — {reply.get('author', 'anonymous')} · {str(reply.get('created_at', ''))[:16]}
+                                </small>
+                            </div>""",
+                            unsafe_allow_html=True,
+                        )
+
+                    # Reply form
+                    with st.expander("↩ Reply to this answer", expanded=False):
+                        with st.form(key=f"qa_reply_{a_id}", clear_on_submit=True):
+                            reply_text = st.text_input("Your reply")
+                            if st.form_submit_button("Post Reply"):
+                                if reply_text.strip():
+                                    add_reply(a_id, reply_text.strip(), current_user)
+                                    st.rerun()
+                                else:
+                                    st.warning("Reply cannot be empty.")
+            else:
+                st.caption("_No answers yet._")
+
+            # Answer form
+            with st.expander("✍️ Answer this question", expanded=False):
+                with st.form(key=f"qa_answer_{q_id}", clear_on_submit=True):
+                    answer_text = st.text_area("Your answer", height=80)
+                    if st.form_submit_button("Post Answer"):
+                        if answer_text.strip():
+                            add_answer(q_id, answer_text.strip(), current_user)
+                            st.rerun()
+                        else:
+                            st.warning("Answer cannot be empty.")
+
+        st.markdown("---")
