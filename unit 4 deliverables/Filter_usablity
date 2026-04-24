@@ -1,0 +1,83 @@
+-----------------------------------
+Intro
+-----------------------------------
+
+We are a team building an online hat store. The feature being tested allows users to filter products based on price, color, style, and availability.
+
+The participant will act as a customer browsing for a hat. They should think out loud while interacting with the prototype and explain their thoughts before taking actions.
+
+-----------------------------------
+Tasks
+-----------------------------------
+
+Task 1:
+You are looking for a hat within a specific budget. Try to find hats that match your price range.
+
+Task 2:
+You have a specific color and style in mind. Try to find a hat that matches those preferences.
+
+Task 3:
+You only want to see hats that are currently available for purchase. Try to adjust the results to match this requirement.
+
+-----------------------------------
+Notes
+-----------------------------------
+
+Participant 1:
+
+Initially scrolled through products instead of using filters
+Took time to notice where filtering options were located
+Used price filter but was unsure if it applied automatically
+Expected results to update instantly
+
+Participant 2:
+
+Used multiple filters at once (color + style + price)
+Became confused when no products appeared after filtering
+Looked for a way to reset filters
+Expected clearer indication of selected filters
+-----------------------------------
+Feedback
+-----------------------------------
+
+Participant 1:
+
+Wanted filters to be more noticeable at first glance
+Expected automatic updates without needing extra steps
+Suggested clearer labeling for price selection
+
+Participant 2:
+
+Found filtering useful but confusing when results disappeared
+Wanted a message explaining why no products were shown
+Expected an easy way to remove or reset filters
+-----------------------------------
+Results
+-----------------------------------
+
+Issue 1: Confusion when no results appear
+
+Users thought the site was broken when nothing showed
+Quote: “Did it just stop working?”
+Hypothesis: No feedback when filters return zero results
+Remedy: Add a message like “No items match your filters” and suggest changes
+
+Issue 2: Unclear if filters are applied
+
+Users were unsure if selections were working
+Quote: “Did it apply or do I need to press something?”
+Hypothesis: Lack of real-time feedback
+Remedy: Enable instant updates and highlight active filters clearly
+
+Issue 3: Difficulty resetting filters
+
+Users struggled to return to original results
+Quote: “How do I undo this?”
+Hypothesis: Reset option is not visible enough
+Remedy: Add a clear “Clear All Filters” button
+-----------------------------------
+Updates (Based on Feedback)
+-----------------------------------
+Implemented “No results found” message with suggestions
+Added “Clear All Filters” button
+Displayed active filters clearly at the side of the page
