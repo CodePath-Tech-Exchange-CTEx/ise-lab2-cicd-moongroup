@@ -154,7 +154,16 @@ def sync_db_cart_into_session():
 def load_live_advice():
     """Generates GenAI style advice via Vertex AI / Gemini."""
     try:
-        result = get_genai_recommendations(USER_ID)
+        cart_enriched = [
+            {
+                "name": next((p["name"] for p in products if p["id"] == pid), pid),
+                "style": next((p.get("style", "") for p in products if p["id"] == pid), ""),
+                "color": next((p.get("color", "") for p in products if p["id"] == pid), ""),
+                "quantity": qty,
+            }
+            for pid, qty in st.session_state.cart.items()
+        ]
+        result = get_genai_recommendations(USER_ID, cart_items=cart_enriched)
         return result.get("recommendations", "No style advice returned.")
     except Exception as e:
         return f"Could not load live style advice right now.\n\n{e}"

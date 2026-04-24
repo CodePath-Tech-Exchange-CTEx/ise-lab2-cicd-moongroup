@@ -492,9 +492,16 @@ def display_cart_page(cart: Dict, products: List[Dict], user_id: str = "user1"):
             cols = st.columns([1, 3, 1, 1], gap="small")
  
             with cols[0]:
-                try:
-                    st.image(product["image"], use_container_width=True)
-                except Exception:
+                _img = product.get("image", "")
+                _img_path = os.path.join("assets", _img)
+                if os.path.exists(_img_path):
+                    st.image(_img_path, use_container_width=True)
+                elif _img.startswith(("http://", "https://")):
+                    try:
+                        st.image(_img, use_container_width=True)
+                    except Exception:
+                        pass
+                else:
                     st.markdown(
                         '<div style="height:64px;background:#EFE8DC;border-radius:8px;"></div>',
                         unsafe_allow_html=True,
@@ -643,20 +650,14 @@ def display_orders_page(orders: List[Dict], products: List[Dict]):
 # ---------------------------
 
 def display_genai_advice(timestamp: str, content: str, motivational_image: str):
-    """
-    Displays the GenAI Style Coach page.
+    inject_css()
 
-    Args:
-        timestamp: str  — when advice was generated
-        content:   str  — advice text from Gemini
-        motivational_image: str — local path or URL
-    """
-    st.title("💡 Style Coach")
-    st.caption(f"Generated: {timestamp}")
+    st.markdown('<p class="hs-eyebrow">Powered by AI</p>', unsafe_allow_html=True)
+    st.title("Style Coach")
 
     if timestamp:
         st.caption(f"Generated: {timestamp}")
-
+        
     if motivational_image:
         try:
             if isinstance(motivational_image, str) and motivational_image.startswith(

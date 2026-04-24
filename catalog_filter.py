@@ -321,6 +321,11 @@ def display_catalog_filter(products: List[Dict], cart: Dict) -> Optional[str]:
                     disabled=(stock == 0),
                 ):
                     add_to_cart(cart, pid, 1)
+                    try:
+                        from data_fetcher import upsert_cart_item
+                        upsert_cart_item("user1", pid, cart[pid])
+                    except Exception as e:
+                        st.warning(f"Cart saved locally but not synced: {e}")
                     st.toast(f"Added {name} to cart!")
             with btn_r:
                 if st.button(
